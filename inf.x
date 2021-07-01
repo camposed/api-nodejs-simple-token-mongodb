@@ -12,7 +12,7 @@ passport.use(new Strategy(
         if (!user) { return cb(null, false); }
         return cb(null, user);
       });
-    }));
+    })); 
 
 
   // curl -v -H "Authorization: Bearer 123456789" http://127.0.0.1:3000/
