@@ -1,11 +1,14 @@
 const express = require('express');
 const Sala = require('../models/sala_reunion_model');
 const ruta = express.Router();
-const Joi = require('joi');
+const Joi = require('joi')
+    .extend(require('@joi/date'));
 
 const passport = require('passport');
 const Strategy = require('passport-http-bearer').Strategy;
 const db = require('../db');
+
+
 
 passport.use(new Strategy(
     function(token, cb) {
@@ -36,8 +39,13 @@ ruta.get('/:id',passport.authenticate('bearer', { session: false }),(req,res) =>
 });
 
 ruta.post('/',passport.authenticate('bearer', { session: false }),(req,res) => {
+    console.log(req.body);
+    if(req.body.fecha_inicio > req.body.fecha_fin){
+        res.status(404).send('La fecha de inicio no puede ser mayor a la de final');
+        return;        
+    }
 
-    const {error, value} = validarUsuario(req.body);
+    const {error, value} = validarRegistroSala(req.body);
 
     if(!error){
         let resultado = crearReservaSala(req.body);
@@ -59,7 +67,7 @@ ruta.post('/',passport.authenticate('bearer', { session: false }),(req,res) => {
 });
 
 ruta.delete('/:id',passport.authenticate('bearer', { session: false }),(req,res) => {
-    console.log(req.params.id);
+
     let resultado = desactivarReserva(req.params.id);
     
     resultado.then(salas => {
@@ -71,7 +79,12 @@ ruta.delete('/:id',passport.authenticate('bearer', { session: false }),(req,res)
 
 ruta.put('/:id',passport.authenticate('bearer', { session: false }),(req,res)=>{
 
-    const {error, value} = validarUsuario(req.body);
+    if(req.body.fecha_inicio > req.body.fecha_fin){
+        res.status(404).send('La fecha de inicio no puede ser mayor a la de final');
+        return;        
+    }
+
+    const {error, value} = validarRegistroSala(req.body);
 
     if(!error){
         let resultado = actualizarReserva(req.params.id, req.body);
@@ -99,11 +112,14 @@ async function listarReservaActivosId(id){
 }
 
 async function crearReservaSala(body) {
+
     let sala = new Sala({
-        usuario : body.usuario,
+        solicita : body.solicita,
         depenencia : body.depenencia,
         fecha_inicio: body.fecha_inicio,
         fecha_fin: body.fecha_fin,
+        hora_inicio: body.hora_inicio,
+        hora_fin: body.hora_fin,
         comentario: body.comentario,
     });
 
@@ -113,10 +129,12 @@ async function crearReservaSala(body) {
 async function actualizarReserva(id, body){
     let sala = await Sala.findByIdAndUpdate(id,{
         $set: {
-        usuario : body.usuario,
+        solicita : body.solicita,
         depenencia : body.depenencia,
         fecha_inicio: body.fecha_inicio,
         fecha_fin: body.fecha_fin,
+        hora_inicio: body.hora_inicio,
+        hora_fin: body.hora_fin,        
         comentario: body.comentario,
         }
     },{new: true});
@@ -136,14 +154,23 @@ async function desactivarReserva(id){
     return sala;
 }
 
-function validarRegistroSala(nom){
+function validarRegistroSala(body){
     const schema = Joi.object({
-        nombre: Joi.string().min(3).required(),
-        depenencia: Joi.string().required(),
-        fecha_inicio : Joi.string().required().date(),
-        fecha_fin : Joi.string().required().date(),
+        solicita: Joi.string().min(3).required(),
+        depenencia: Joi.string().min(3).required(),
+        fecha_inicio : Joi.date().required().format('DD/MM/YYY').utc(),
+        fecha_fin : Joi.date().required().format('DD/MM/YYYY').utc(),
+        hora_inicio: Joi.string().required(),
+        hora_fin : Joi.string().required(),
     });
-    return (schema.validate({ nombre: nom }));
+    return (schema.validate({ solicita: body.solicita, 
+                                depenencia: body.depenencia,
+                                fecha_inicio: body.fecha_inicio,
+                                fecha_fin: body.fecha_fin,
+                                hora_inicio: body.hora_inicio,
+                                hora_fin: body.hora_fin
+                            }));
 }
+
 
 module.exports = ruta;

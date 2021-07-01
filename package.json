@@ -10,8 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@joi/date": "^2.1.0",
     "express": "^4.17.1",
     "joi": "^17.4.0",
+    "moment-timezone": "^0.5.33",
     "mongoose": "^5.13.0",
     "passport": "^0.4.1",
     "passport-http-bearer": "^1.0.1"

@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
+const moment = require('moment-timezone');
+const sv_date = moment.tz(Date.now(), "America/El_Salvador");
 
 const salaSchema = new mongoose.Schema({
-    usuario: {
+    solicita: {
         type:String, 
         required:false
     },
@@ -10,21 +12,26 @@ const salaSchema = new mongoose.Schema({
         required:false
     },
     fecha_inicio: {
-        type:Date, 
+        type:String, 
         required:false
     },
     fecha_fin: {
-        type:Date, 
+        type:String, 
         required:false
     },
+    hora_inicio: {
+        type:String, 
+        required:false
+    },
+    hora_fin: {
+        type:String, 
+        required:false
+    },    
     comentario: {
         type:String, 
         required:false
     },
-    created:{
-        type:Date, 
-        default: Date.now
-    },
+    created:{type: Date, default: sv_date},
     activo: {
         type:Boolean, 
         default:true
