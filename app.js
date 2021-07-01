@@ -1,5 +1,4 @@
 //importando las rutas
-const usuarios = require('./routes/usuarios');
 const sala = require('./routes/sala');
 
 //impotando express y mongoose
