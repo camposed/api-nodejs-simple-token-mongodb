@@ -7,7 +7,7 @@ const salaSchema = new mongoose.Schema({
         type:String, 
         required:false
     },
-    depenencia:{
+    dependencia:{
         type:String, 
         required:false
     },

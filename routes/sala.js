@@ -39,7 +39,7 @@ ruta.get('/:id',passport.authenticate('bearer', { session: false }),(req,res) =>
 });
 
 ruta.post('/',passport.authenticate('bearer', { session: false }),(req,res) => {
-    console.log(req.body);
+
     if(req.body.fecha_inicio > req.body.fecha_fin){
         res.status(404).send('La fecha de inicio no puede ser mayor a la de final');
         return;        
@@ -115,7 +115,7 @@ async function crearReservaSala(body) {
 
     let sala = new Sala({
         solicita : body.solicita,
-        depenencia : body.depenencia,
+        dependencia : body.dependencia,
         fecha_inicio: body.fecha_inicio,
         fecha_fin: body.fecha_fin,
         hora_inicio: body.hora_inicio,
@@ -130,7 +130,7 @@ async function actualizarReserva(id, body){
     let sala = await Sala.findByIdAndUpdate(id,{
         $set: {
         solicita : body.solicita,
-        depenencia : body.depenencia,
+        dependencia : body.dependencia,
         fecha_inicio: body.fecha_inicio,
         fecha_fin: body.fecha_fin,
         hora_inicio: body.hora_inicio,
@@ -157,14 +157,14 @@ async function desactivarReserva(id){
 function validarRegistroSala(body){
     const schema = Joi.object({
         solicita: Joi.string().min(3).required(),
-        depenencia: Joi.string().min(3).required(),
+        dependencia: Joi.string().min(3).required(),
         fecha_inicio : Joi.date().required().format('DD/MM/YYY').utc(),
         fecha_fin : Joi.date().required().format('DD/MM/YYYY').utc(),
         hora_inicio: Joi.string().required(),
         hora_fin : Joi.string().required(),
     });
     return (schema.validate({ solicita: body.solicita, 
-                                depenencia: body.depenencia,
+                                dependencia: body.dependencia,
                                 fecha_inicio: body.fecha_inicio,
                                 fecha_fin: body.fecha_fin,
                                 hora_inicio: body.hora_inicio,
